@@ -5,5 +5,5 @@ COPY ./* /workspace/
 WORKDIR /workspace/
 RUN yarn install
 RUN ls -la
-EXPOSE 3000
-CMD ["node", "app.js"]
+EXPOSE 80
+CMD ["npm", "start"]
