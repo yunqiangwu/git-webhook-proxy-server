@@ -1,6 +1,8 @@
 const Koa = require('koa');
 const bodyParser = require('koa-bodyparser');
 
+const PORT = process.env.PORT || 80
+
 const app = new Koa();
 
 app.use(bodyParser());
@@ -12,4 +14,4 @@ app.use(async ctx => {
   ctx.body = 'Helsalssdfdso sds';
 });
 
-app.listen(80);
+app.listen(PORT);
