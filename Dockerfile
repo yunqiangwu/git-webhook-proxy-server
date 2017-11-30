@@ -63,9 +63,9 @@ RUN set -ex \
 
 
 RUN npm install -g yarn --registry=https://registry.npm.taobao.org
-COPY ./* /workspace/
+COPY ./ /workspace/
 WORKDIR /workspace/
 RUN yarn install
 RUN ls -la
-EXPOSE 80
+EXPOSE 3000
 CMD ["npm", "start"]
