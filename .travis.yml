@@ -1,0 +1,48 @@
+sudo: required
+
+language: python
+
+env:
+  global:
+    - OPENSHIFT_PROJECT_NAME=front-server
+    - OPENSHIFT_SERVER=https://api.starter-ca-central-1.openshift.com
+    - OPENSHIFT_USER=842269153@qq.com
+    - OPENSHIFT_PWD=wu950429
+    - DOCKER_REGISTRY_HOST=registry.saas.hand-china.com
+    - DOCKER_USER=yunqiang.wu
+    - DOCKER_PWD=Wu950429
+    - DOCKER_PROJECT=test
+
+services:
+  - docker
+
+
+
+before_install:
+  - |
+    if [ ! -f ~/.bin/oc ]; then
+      mkdir -p ~/.bin/
+      wget https://github.com/openshift/origin/releases/download/v3.7.0/openshift-origin-client-tools-v3.7.0-7ed6862-linux-64bit.tar.gz
+      tar zxvf openshift-origin-client-tools-v3.7.0-7ed6862-linux-64bit.tar.gz -C /tmp/
+      cp /tmp/openshift-origin-client-tools-v3.7.0-7ed6862-linux-64bit/oc ~/.bin/
+    fi
+  - export PATH=${PATH}:$(cd ~/.bin/ && pwd)
+
+script:
+  - commit_sha=$TRAVIS_COMMIT
+  - app_name=${TRAVIS_REPO_SLUG#*/}
+  - image_tag=${TRAVIS_BRANCH}-${commit_sha:0:8}
+  - FULL_IMAGE_NAME=${DOCKER_REGISTRY_HOST}/${DOCKER_PROJECT}/${app_name}:${image_tag}
+  - cd gitlabci
+  - bash openshift-deploy-ci.sh $commit_sha $app_name $image_tag
+  - cd ..
+  - docker login $DOCKER_REGISTRY_HOST -u $DOCKER_USER -p $DOCKER_PWD
+  - docker build -t $FULL_IMAGE_NAME .
+  - docker images -a
+  - echo $FULL_IMAGE_NAME
+  - docker push $FULL_IMAGE_NAME
+  - oc login $OPENSHIFT_SERVER -u $OPENSHIFT_USER -p $OPENSHIFT_PWD --insecure-skip-tls-verify
+  - oc project "$OPENSHIFT_PROJECT_NAME" 2> /dev/null || oc new-project "$OPENSHIFT_PROJECT_NAME"
+  - oc apply -f gitlabci/.generated/*.yml -n $OPENSHIFT_PROJECT_NAME
+  - env
+  - cat gitlabci/.generated/*.yml

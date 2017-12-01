@@ -19,6 +19,8 @@ function broadcast(data) {
 };
 
 app.use(bodyParser());
+
+
 app.use(async (ctx, next) => {
 
   let message = JSON.stringify({
@@ -26,12 +28,18 @@ app.use(async (ctx, next) => {
   	body: ctx.request.body,
   },null,2);
 
-  console.log(message);
   if(ctx.request.url.startsWith("/hook")){
   	broadcast(message);
+    console.log(message);
   	ctx.body = "{}"
   	return;
   }
+
+  if(ctx.request.url.startsWith("/health")){
+    ctx.body = "{}"
+    return;
+  }
+  console.log(message);
   await next();
 });
 

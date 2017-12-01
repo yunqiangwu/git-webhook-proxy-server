@@ -1,0 +1,76 @@
+kind: DeploymentConfig
+apiVersion: v1
+metadata:
+  name: ${APP_NAME}
+spec:
+  replicas: 1
+  selector:
+    name: ${APP_NAME}
+  template:
+    metadata:
+      labels:
+        name: ${APP_NAME}
+        CI_COMMIT_SHA: $CI_COMMIT_SHA
+    spec:
+      containers:
+      - name: ${APP_NAME}
+        image: ${DOCKER_REGISTRY_HOST}/${DOCKER_PROJECT}/${APP_NAME}:$IMAGES_TAG
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 3000
+          protocol: TCP
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          value: sit
+        - name: EUREKA_DEFAULT_ZONE
+          value: http://hap-register-server:8000/eureka/
+        readinessProbe:
+          exec:
+            command:
+              - curl
+              - 'localhost:3000/health'
+          initialDelaySeconds: 60
+          timeoutSeconds: 1
+        resources:
+          requests:
+            memory: 256Mi
+          limits:
+            memory: 1024Mi
+  triggers:
+  - type: ConfigChange
+  strategy:
+    type: Rolling
+  paused: false
+  revisionHistoryLimit: 2
+  minReadySeconds: 0
+
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    app: ${APP_NAME}
+  name: ${APP_NAME}
+spec:
+  ports:
+  - port: 80
+    targetPort: 3000
+    protocol: TCP
+  selector:
+    name: ${APP_NAME}
+
+
+---
+apiVersion: v1
+kind: Route
+metadata:
+  labels:
+    app: git-webhook-proxy-server
+  name: git-webhook-proxy-server
+spec:
+  to:
+    kind: Service
+    name: git-webhook-proxy-server
+    weight: 100
+  wildcardPolicy: None
