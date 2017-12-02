@@ -2,7 +2,7 @@
 
 
 const consoleEle = document.querySelector('.console')
-const socket = new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://')+location.host+(location.port?(':'+location.port):':80'));
+const socket = new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://')+location.host.replace(/:.*$/,'')+(location.port?(':'+location.port):':80'));
 
 // Connection opened
 socket.addEventListener('open', function (event) {
