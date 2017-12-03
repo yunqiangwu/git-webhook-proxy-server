@@ -34,7 +34,7 @@ function broadcast(data) {
       }
       console.log("Hook Event: " + gitEvent);
       if(gitEvent === 'push'){
-        client.send(JSON.stringify(data,null,2));
+        client.send(JSON.stringify(data));
       }
     }
   });
@@ -47,7 +47,7 @@ app.use(async (ctx, next) => {
 
   let message = {
   	request: ctx.request,
-  	body: ctx.request.body.payload ? JSON.parse(ctx.request.body.payload) : ctx.request.body,
+  	body: ctx.request.body,
   };
   // let messageStr = JSON.stringify(message,null,2);
 
