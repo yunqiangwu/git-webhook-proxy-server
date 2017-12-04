@@ -16,6 +16,7 @@ function broadcast(data) {
     if (client.readyState === 1) {
       if(!client.registerOps){
         console.log('not register');
+        client.send(JSON.stringify(data));
         return;
       }
       let remoteBranch = data.body.ref.replace('refs/heads/','');
