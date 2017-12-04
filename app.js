@@ -19,7 +19,7 @@ function broadcast(data) {
         client.send(JSON.stringify(data));
         return;
       }
-      let remoteBranch = data.body.ref.replace('refs/heads/','');
+      let remoteBranch = data.body.ref && data.body.ref.replace('refs/heads/','');
       let localBranch = client.registerOps.branch;
       let remoteRepositoryName = data.body.repository.name;
       let localRepositoryName = client.registerOps.repository;
