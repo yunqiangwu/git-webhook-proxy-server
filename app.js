@@ -53,7 +53,9 @@ app.use(async (ctx, next) => {
   // let messageStr = JSON.stringify(message,null,2);
 
   if(ctx.request.url.startsWith("/hook")){
-  	broadcast(message);
+    setTimeout(()=>{
+      broadcast(message);
+    },0);
   	ctx.body = "{}"
   	return;
   }
