@@ -15,7 +15,7 @@ function broadcast(data) {
   app.ws.server.clients.forEach(function each(client) {
     if (client.readyState === 1) {
       if(!client.registerOps || !data.body.repository){
-        console.log('not register');
+        console.log('not register', client.registerOps, data.body.repository);
         client.send(JSON.stringify(data));
         return;
       }
